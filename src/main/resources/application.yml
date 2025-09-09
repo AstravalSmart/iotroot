@@ -1,14 +1,14 @@
 server:
-  port: 5000
+  port: 8080
 
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://root:astraval25@iot.e4vu4bo.mongodb.net/iot_platform
-      database: iot_platform   # <-- explicitly specify database name
+      uri: mongodb+srv://root:astraval25@iot.e4vu4bo.mongodb.net/user_platform
+      database: iotRoot
 
-mqtt:
-  broker: tcp://192.168.1.7:1883
-  clientId: spring_ingest
-  topic: devices/+/+/telemetry
+logging:
+  level:
+    root: WARN
+    com.astraval.iotroot: INFO
   

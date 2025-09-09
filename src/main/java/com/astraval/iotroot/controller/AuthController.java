@@ -4,6 +4,7 @@ import com.astraval.iotroot.model.User;
 import com.astraval.iotroot.service.AuthService;
 import com.astraval.iotroot.service.UserService;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -17,8 +18,12 @@ public class AuthController {
     }
 
  @PostMapping("/register")
-public User register(@RequestBody User user) {
-    return userService.register(user);
+public Object register(@RequestBody User user) {
+    try {
+        return userService.register(user);
+    } catch (RuntimeException e) {
+        return Map.of("error", e.getMessage());
+    }
 }
 
 @PostMapping("/login")

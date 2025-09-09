@@ -2,6 +2,8 @@ package com.astraval.iotroot.service;
 
 import com.astraval.iotroot.model.User;
 import com.astraval.iotroot.repo.UserRepository;
+import com.astraval.iotroot.event.UserCreatedEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -9,15 +11,22 @@ import java.util.List;
 @Service
 public class UserService {
     private final UserRepository repo;
+    private final ApplicationEventPublisher eventPublisher;
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-    public UserService(UserRepository repo) {
+    public UserService(UserRepository repo, ApplicationEventPublisher eventPublisher) {
         this.repo = repo;
+        this.eventPublisher = eventPublisher;
     }
 
     public User register(User user) {
+        if (repo.findByEmail(user.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already exists");
+        }
         user.setPassword(encoder.encode(user.getPassword()));
-        return repo.save(user);
+        User savedUser = repo.save(user);
+        eventPublisher.publishEvent(new UserCreatedEvent(this, user.getEmail()));
+        return savedUser;
     }
 
     public List<User> getAll() {
