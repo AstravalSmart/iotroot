@@ -22,6 +22,11 @@ public class Topic {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(columnDefinition = "TEXT")
+    private String lastReceivedMessage;
+
+    private LocalDateTime lastMessageTimestamp;
+
     public Topic() {
         this.createdAt = LocalDateTime.now();
     }
@@ -40,4 +45,10 @@ public class Topic {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public String getLastReceivedMessage() { return lastReceivedMessage; }
+    public void setLastReceivedMessage(String lastReceivedMessage) { this.lastReceivedMessage = lastReceivedMessage; }
+
+    public LocalDateTime getLastMessageTimestamp() { return lastMessageTimestamp; }
+    public void setLastMessageTimestamp(LocalDateTime lastMessageTimestamp) { this.lastMessageTimestamp = lastMessageTimestamp; }
 }

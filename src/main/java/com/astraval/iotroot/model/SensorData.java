@@ -12,9 +12,11 @@ public class SensorData {
     private String topic;
     private String message;
     private LocalDateTime timestamp;
+    private LocalDateTime serverReceivedAt;
 
     public SensorData() {
         this.timestamp = LocalDateTime.now();
+        this.serverReceivedAt = LocalDateTime.now();
     }
 
     public String getId() { return id; }
@@ -31,4 +33,7 @@ public class SensorData {
 
     public LocalDateTime getTimestamp() { return timestamp; }
     public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
+
+    public LocalDateTime getServerReceivedAt() { return serverReceivedAt; }
+    public void setServerReceivedAt(LocalDateTime serverReceivedAt) { this.serverReceivedAt = serverReceivedAt; }
 }

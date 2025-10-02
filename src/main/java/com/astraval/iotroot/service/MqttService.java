@@ -2,7 +2,11 @@ package com.astraval.iotroot.service;
 
 import com.astraval.iotroot.config.MqttConfig;
 import com.astraval.iotroot.model.SensorData;
+import com.astraval.iotroot.model.Topic;
 import com.astraval.iotroot.repo.SensorDataRepository;
+import com.astraval.iotroot.repo.TopicRepository;
+import com.astraval.iotroot.service.WebSocketService;
+import java.time.LocalDateTime;
 import org.eclipse.paho.client.mqttv3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +26,12 @@ public class MqttService implements MqttCallback {
     
     @Autowired
     private SensorDataRepository sensorDataRepository;
+    
+    @Autowired
+    private TopicRepository topicRepository;
+    
+    @Autowired
+    private WebSocketService webSocketService;
     
     private MqttClient mqttClient;
 
@@ -85,8 +95,18 @@ public class MqttService implements MqttCallback {
                 data.setTopic(topic);
                 data.setMessage(payload);
                 
-                sensorDataRepository.save(data);
-                logger.info("Saved sensor data for user: {} from device: {}", userId, deviceName);
+                SensorData savedData = sensorDataRepository.save(data);
+                
+                // Update topic's last received message
+                topicRepository.findByUserIdAndDeviceName(userId, deviceName)
+                    .ifPresent(topicEntity -> {
+                        topicEntity.setLastReceivedMessage(payload);
+                        topicEntity.setLastMessageTimestamp(LocalDateTime.now());
+                        topicRepository.save(topicEntity);
+                    });
+                
+                webSocketService.sendSensorData(savedData);
+                logger.info("Saved and broadcasted sensor data for user: {} from device: {}", userId, deviceName);
             }
         }
     }
