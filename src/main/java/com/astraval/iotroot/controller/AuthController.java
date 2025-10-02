@@ -27,9 +27,12 @@ public Object register(@RequestBody User user) {
 }
 
 @PostMapping("/login")
-public String login(@RequestBody User user) {
-    boolean ok = authService.login(user.getEmail(), user.getPassword());
-    return ok ? "Login success" : "Invalid credentials";
+public Map<String, Object> login(@RequestBody User user) {
+    String userId = authService.login(user.getEmail(), user.getPassword());
+    if (userId != null) {
+        return Map.of("success", true, "userId", userId, "message", "Login success");
+    }
+    return Map.of("success", false, "message", "Invalid credentials");
 }
 
 }

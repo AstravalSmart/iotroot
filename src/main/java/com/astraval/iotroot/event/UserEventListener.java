@@ -8,6 +8,6 @@ public class UserEventListener {
 
     @EventListener
     public void handleUserCreated(UserCreatedEvent event) {
-        System.out.println("📢 New user registered: " + event.getUsername());
+        System.out.println("📢 New user registered: " + event.getUserId());
     }
 }

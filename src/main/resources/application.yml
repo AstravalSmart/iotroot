@@ -4,8 +4,16 @@ server:
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://root:astraval25@iot.e4vu4bo.mongodb.net/user_platform
-      database: iotRoot
+      uri: mongodb://ietmdb:ietlab25@192.168.1.7:27017?authSource=admin
+      database: IeTRootDB
+
+mqtt:
+  broker:
+    url: tcp://192.168.1.7:1883
+    username: testuser
+    password: iet25
+    client-id: iotroot-backend
+    topic: test/topic
 
 logging:
   level:

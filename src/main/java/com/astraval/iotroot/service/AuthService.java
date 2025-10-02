@@ -10,7 +10,7 @@ public class AuthService {
         this.userService = userService;
     }
 
-    public boolean login(String username, String password) {
-        return userService.validate(username, password);
+    public String login(String email, String password) {
+        return userService.validateAndGetUserId(email, password);
     }
 }

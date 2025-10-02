@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -23,9 +24,10 @@ public class UserService {
         if (repo.findByEmail(user.getEmail()).isPresent()) {
             throw new RuntimeException("Email already exists");
         }
+        user.setUserId("user" + UUID.randomUUID().toString().replace("-", "").substring(0, 8));
         user.setPassword(encoder.encode(user.getPassword()));
         User savedUser = repo.save(user);
-        eventPublisher.publishEvent(new UserCreatedEvent(this, user.getEmail()));
+        eventPublisher.publishEvent(new UserCreatedEvent(this, user.getUserId()));
         return savedUser;
     }
 
@@ -36,5 +38,12 @@ public boolean validate(String email, String rawPassword) {
     return repo.findByEmail(email)
                .map(u -> encoder.matches(rawPassword, u.getPassword()))
                .orElse(false);
+    }
+
+    public String validateAndGetUserId(String email, String rawPassword) {
+        return repo.findByEmail(email)
+                   .filter(u -> encoder.matches(rawPassword, u.getPassword()))
+                   .map(User::getUserId)
+                   .orElse(null);
     }
 }
