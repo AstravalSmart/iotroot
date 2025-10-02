@@ -1,6 +1,8 @@
 package com.astraval.iotroot.service;
 
 import com.astraval.iotroot.config.MqttConfig;
+import com.astraval.iotroot.model.SensorData;
+import com.astraval.iotroot.repo.SensorDataRepository;
 import org.eclipse.paho.client.mqttv3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +19,9 @@ public class MqttService implements MqttCallback {
     
     @Autowired
     private MqttConfig mqttConfig;
+    
+    @Autowired
+    private SensorDataRepository sensorDataRepository;
     
     private MqttClient mqttClient;
 
@@ -41,8 +46,8 @@ public class MqttService implements MqttCallback {
             // If successful → subscribes to the topic from config.
             if (mqttClient.isConnected()) {
                 logger.info("Successfully connected to MQTT broker");
-                mqttClient.subscribe(mqttConfig.getTopic());
-                logger.info("Subscribed to topic: {}", mqttConfig.getTopic());
+                mqttClient.subscribe("ietroot/user/+/+"); // Subscribe to all user device topics
+                logger.info("Subscribed to all user device topics: ietroot/user/+/+");
             }
             
         } catch (MqttException e) {
@@ -57,7 +62,33 @@ public class MqttService implements MqttCallback {
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
-        logger.info("Message received on topic '{}': {}", topic, new String(message.getPayload()));
+        String payload = new String(message.getPayload());
+        
+        // Enhanced logging for terminal display
+        System.out.println("\n=== MQTT MESSAGE RECEIVED ===");
+        System.out.println("Topic: " + topic);
+        System.out.println("Payload: " + payload);
+        System.out.println("Timestamp: " + java.time.LocalDateTime.now());
+        System.out.println("============================\n");
+        
+        logger.info("Message received on topic '{}': {}", topic, payload);
+        
+        // Extract userId from topic (format: ietroot/user/{userId}/{deviceName})
+        if (topic.startsWith("ietroot/user/")) {
+            String[] parts = topic.split("/");
+            if (parts.length >= 4) {
+                String userId = parts[2];
+                String deviceName = parts[3];
+                
+                SensorData data = new SensorData();
+                data.setUserId(userId);
+                data.setTopic(topic);
+                data.setMessage(payload);
+                
+                sensorDataRepository.save(data);
+                logger.info("Saved sensor data for user: {} from device: {}", userId, deviceName);
+            }
+        }
     }
 
     @Override
