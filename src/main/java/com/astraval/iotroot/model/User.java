@@ -1,20 +1,26 @@
 package com.astraval.iotroot.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.*;
 
-@Document(collection = "users")
+@Entity
+@Table(name = "users")
 public class User {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private String userId;      // unique user ID with "user" prefix
+    @Column(unique = true, nullable = false)
+    private String userId;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
+    @Column(nullable = false)
     private String password;
 
     // getters & setters
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
