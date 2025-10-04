@@ -46,4 +46,10 @@ public boolean validate(String email, String rawPassword) {
                    .map(User::getUserId)
                    .orElse(null);
     }
+    
+    public User validateAndGetUser(String email, String rawPassword) {
+        return repo.findByEmail(email)
+                   .filter(u -> encoder.matches(rawPassword, u.getPassword()))
+                   .orElse(null);
+    }
 }

@@ -28,11 +28,21 @@ public Object register(@RequestBody User user) {
 
 @PostMapping("/login")
 public Map<String, Object> login(@RequestBody User user) {
-    String userId = authService.login(user.getEmail(), user.getPassword());
-    if (userId != null) {
-        return Map.of("success", true, "userId", userId, "message", "Login success");
+    try {
+        User authenticatedUser = authService.authenticate(user.getEmail(), user.getPassword());
+        if (authenticatedUser != null) {
+            return Map.of(
+                "success", true, 
+                "userId", authenticatedUser.getId(), 
+                "email", authenticatedUser.getEmail(),
+                "username", authenticatedUser.getEmail(),
+                "message", "Login successful"
+            );
+        }
+        return Map.of("success", false, "message", "Invalid email or password");
+    } catch (Exception e) {
+        return Map.of("success", false, "message", "Login failed: " + e.getMessage());
     }
-    return Map.of("success", false, "message", "Invalid credentials");
 }
 
 }
